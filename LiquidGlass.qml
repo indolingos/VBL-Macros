@@ -36,7 +36,6 @@ ApplicationWindow {
         antialiasing: true
     }
 
-    // Soft environmental color. The native Windows Acrylic backdrop sits behind this layer.
     Item {
         anchors.fill: parent
         clip: true
@@ -71,7 +70,6 @@ ApplicationWindow {
         }
     }
 
-    // Main floating glass sheet.
     Rectangle {
         id: sheet
         anchors.fill: parent
@@ -92,7 +90,6 @@ ApplicationWindow {
         }
     }
 
-    // Hairline rim highlight, like reflected light over curved glass.
     Rectangle {
         anchors.fill: sheet
         anchors.margins: 1
@@ -107,16 +104,15 @@ ApplicationWindow {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton
         hoverEnabled: true
-        onPositionChanged: {
+        onPositionChanged: function(mouse) {
             window.mx = mouse.x
             window.my = mouse.y
         }
-        onPressed: {
+        onPressed: function(mouse) {
             window.startSystemMove()
         }
     }
 
-    // Header / window controls.
     RowLayout {
         id: header
         anchors.left: sheet.left
@@ -174,8 +170,8 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 spacing: 2
                 Text { text: "VBL"; color: "#F7F8FB"; font.pixelSize: 12; font.bold: true; opacity: 0.82 }
-                Text { text: "Macro"; color: "#FFFFFF"; font.pixelSize: 30; font.bold: true; font.letterSpacing: -1.2 }
-                Text { text: "INPUT AUTOMATION"; color: "#A9AFBB"; font.pixelSize: 9; font.letterSpacing: 1.8 }
+                Text { text: "Macro"; color: "#FFFFFF"; font.pixelSize: 30; font.bold: true }
+                Text { text: "INPUT AUTOMATION"; color: "#A9AFBB"; font.pixelSize: 9 }
             }
             Rectangle {
                 Layout.preferredWidth: 250; Layout.preferredHeight: 42; radius: 21
@@ -191,7 +187,6 @@ ApplicationWindow {
             }
         }
 
-        // Hero card.
         Rectangle {
             id: hero
             Layout.fillWidth: true
@@ -223,15 +218,13 @@ ApplicationWindow {
                         anchors.centerIn: parent
                         width: 150; height: 150
                         transformOrigin: Item.Center
-                        scale: 1 + (Math.abs(window.mx - width/2) < window.width ? 0 : 0)
                         Rectangle { anchors.centerIn: parent; width: 122; height: 122; radius: 61; color: backend.running ? "#277BE7B0" : "#15FFFFFF"; opacity: 0.32; layer.enabled: true; layer.effect: MultiEffect { blurEnabled: true; blur: 1; blurMax: 30 } }
                         Rectangle { anchors.centerIn: parent; width: 94; height: 94; radius: 47; color: "#1CFFFFFF"; border.color: backend.running ? "#887BE7B0" : "#34FFFFFF"; border.width: 1 }
                         Rectangle { anchors.centerIn: parent; width: 72; height: 72; radius: 36; color: backend.running ? "#587BE7B0" : "#18252A34" }
                         Rectangle { anchors.centerIn: parent; width: 20; height: 20; radius: 10; color: "#FFFFFF"; opacity: backend.running ? 1 : 0.92 }
                         Rectangle { anchors.centerIn: parent; width: 5; height: 5; radius: 2.5; color: backend.running ? "#7BE7B0" : "#A4AAB4" }
-                        Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
                     }
-                    Text { anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.bottom; text: backend.running ? (backend.robloxFocused ? "LIVE" : "WAITING") : "STANDBY"; color: backend.running ? (backend.robloxFocused ? "#A6F4C8" : "#FFE28C") : "#AEB4BF"; font.pixelSize: 9; font.bold: true; font.letterSpacing: 2.2 }
+                    Text { anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.bottom; text: backend.running ? (backend.robloxFocused ? "LIVE" : "WAITING") : "STANDBY"; color: backend.running ? (backend.robloxFocused ? "#A6F4C8" : "#FFE28C") : "#AEB4BF"; font.pixelSize: 9; font.bold: true }
                 }
 
                 ColumnLayout {
@@ -239,7 +232,7 @@ ApplicationWindow {
                     Layout.fillHeight: true
                     Layout.alignment: Qt.AlignVCenter
                     spacing: 5
-                    Text { text: "ENGINE STATUS"; color: "#9FA5B0"; font.pixelSize: 9; font.bold: true; font.letterSpacing: 1.2 }
+                    Text { text: "ENGINE STATUS"; color: "#9FA5B0"; font.pixelSize: 9; font.bold: true }
                     Text { text: backend.running ? (backend.robloxFocused ? "INPUT LIVE" : "WAITING FOR ROBLOX") : "READY"; color: "#F8F9FC"; font.pixelSize: 24; font.bold: true }
                     Text { text: backend.running ? "Focus lock is protecting your input." : "Arm the macro whenever you are ready."; color: "#AAB0BA"; font.pixelSize: 10 }
                     Item { Layout.fillHeight: true }
@@ -247,15 +240,13 @@ ApplicationWindow {
                         Layout.fillWidth: true; Layout.preferredHeight: 58; radius: 19
                         color: backend.running ? "#237BE7B0" : "#14FFFFFF"
                         border.width: 1; border.color: backend.running ? "#667BE7B0" : "#20FFFFFF"
-                        Text { anchors.centerIn: parent; text: backend.running ? "STOP MACRO" : "START MACRO"; color: "#FFFFFF"; font.pixelSize: 12; font.bold: true; font.letterSpacing: 0.6 }
+                        Text { anchors.centerIn: parent; text: backend.running ? "STOP MACRO" : "START MACRO"; color: "#FFFFFF"; font.pixelSize: 12; font.bold: true }
                         MouseArea { anchors.fill: parent; onClicked: backend.toggle() }
-                        ScaleAnimator on scale { from: 0.985; to: 1.0; duration: 140; running: false }
                     }
                 }
             }
         }
 
-        // Command glass strip.
         Rectangle {
             Layout.fillWidth: true; Layout.preferredHeight: 126; radius: 24
             color: "#16FFFFFF"; border.width: 1; border.color: "#25FFFFFF"
@@ -263,9 +254,9 @@ ApplicationWindow {
                 anchors.fill: parent; anchors.margins: 16; spacing: 9
                 RowLayout {
                     Layout.fillWidth: true
-                    Text { text: "COMBO PROFILES"; color: "#A5ABB5"; font.pixelSize: 9; font.bold: true; font.letterSpacing: 1.1 }
+                    Text { text: "COMBO PROFILES"; color: "#A5ABB5"; font.pixelSize: 9; font.bold: true }
                     Item { Layout.fillWidth: true }
-                    Text { text: "LIVE PIPELINE"; color: "#91DFFF"; font.pixelSize: 8; font.bold: true; font.letterSpacing: 1.1 }
+                    Text { text: "LIVE PIPELINE"; color: "#91DFFF"; font.pixelSize: 8; font.bold: true }
                 }
                 RowLayout {
                     Layout.fillWidth: true; spacing: 10
@@ -281,7 +272,7 @@ ApplicationWindow {
                                 Rectangle { width: 34; height: 34; radius: 11; color: modelData.color; Text { anchors.centerIn: parent; text: modelData.key; color: "#14161B"; font.pixelSize: 13; font.bold: true } }
                                 ColumnLayout { spacing: 1; Layout.fillWidth: true
                                     Text { text: modelData.text + "  →  " + modelData.sub + (modelData.end !== "" ? "  →  " + modelData.end : ""); color: "#EEF0F5"; font.pixelSize: 9; font.bold: true }
-                                    Text { text: modelData.end !== "" ? "3-STEP PROFILE" : "2-STEP PROFILE"; color: modelData.color; font.pixelSize: 7; font.bold: true; font.letterSpacing: 1 }
+                                    Text { text: modelData.end !== "" ? "3-STEP PROFILE" : "2-STEP PROFILE"; color: modelData.color; font.pixelSize: 7; font.bold: true }
                                 }
                             }
                         }
@@ -290,14 +281,13 @@ ApplicationWindow {
             }
         }
 
-        // Telemetry footer.
         Rectangle {
             Layout.fillWidth: true; Layout.fillHeight: true; radius: 24
             color: "#16FFFFFF"; border.width: 1; border.color: "#25FFFFFF"
             ColumnLayout {
                 anchors.fill: parent; anchors.margins: 16; spacing: 10
                 RowLayout { Layout.fillWidth: true
-                    Text { text: "SESSION"; color: "#A5ABB5"; font.pixelSize: 9; font.bold: true; font.letterSpacing: 1.1 }
+                    Text { text: "SESSION"; color: "#A5ABB5"; font.pixelSize: 9; font.bold: true }
                     Item { Layout.fillWidth: true }
                     Text { text: backend.running ? backend.uptime : "00:00:00"; color: "#E9EBF1"; font.pixelSize: 10; font.bold: true }
                 }
@@ -312,28 +302,18 @@ ApplicationWindow {
                         delegate: Rectangle {
                             Layout.fillWidth: true; Layout.preferredHeight: 60; radius: 17
                             color: "#12FFFFFF"; border.width: 1; border.color: "#15FFFFFF"
-                            Column { anchors.fill: parent; anchors.margins: 10; spacing: 5
-                                Text { text: modelData.title; color: "#7F8692"; font.pixelSize: 7; font.bold: true; font.letterSpacing: 0.8 }
-                                Text { text: modelData.value; color: modelData.color; font.pixelSize: 14; font.bold: true }
+                            Column { anchors.fill: parent; anchors.margins: 10; spacing: 3
+                                Text { text: modelData.title; color: "#898F9B"; font.pixelSize: 7; font.bold: true }
+                                Text { text: modelData.value; color: "#F5F6FA"; font.pixelSize: 14; font.bold: true }
                             }
                         }
                     }
                 }
+                Text { text: "ACTIVITY"; color: "#A5ABB5"; font.pixelSize: 8; font.bold: true }
                 Rectangle {
                     Layout.fillWidth: true; Layout.fillHeight: true; radius: 18
-                    color: "#0F000000"; border.width: 1; border.color: "#12FFFFFF"
-                    ColumnLayout { anchors.fill: parent; anchors.margins: 13; spacing: 6
-                        RowLayout { Layout.fillWidth: true
-                            Text { text: "ACTIVITY"; color: "#9198A4"; font.pixelSize: 8; font.bold: true; font.letterSpacing: 1 }
-                            Item { Layout.fillWidth: true }
-                            Text { text: "READY"; color: backend.running ? "#7BE7B0" : "#868D98"; font.pixelSize: 7; font.bold: true }
-                        }
-                        Text {
-                            Layout.fillWidth: true; Layout.fillHeight: true
-                            text: backend.eventCount === 0 ? "System ready.\nArm the macro, focus Roblox, and press ` or R." : (backend.lastKey === "`" ? "3-step combo executed successfully." : "2-step combo executed successfully.")
-                            color: "#9FA6B2"; font.pixelSize: 9; wrapMode: Text.WordWrap; verticalAlignment: Text.AlignVCenter
-                        }
-                    }
+                    color: "#0E000000"; border.width: 1; border.color: "#15FFFFFF"
+                    Text { anchors.centerIn: parent; text: "Ready for macro activity"; color: "#686F7B"; font.pixelSize: 9 }
                 }
             }
         }
@@ -341,36 +321,28 @@ ApplicationWindow {
 
     Connections {
         target: backend
-        function onToast(text, accent) {
-            toast.text = text
-            toast.accent = accent
-            toast.visible = true
-            toast.opacity = 0
-            toast.y = window.height - 68
-            toastAnim.start()
+        function onToast(message, color) {
+            toastText.text = message
+            toastText.color = color
+            toastText.opacity = 1
             toastTimer.restart()
         }
     }
 
     Rectangle {
-        id: toast
-        visible: false
-        width: toastText.implicitWidth + 34
+        id: toastBubble
+        visible: toastText.opacity > 0
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: sheet.bottom
+        anchors.bottomMargin: 18
+        width: Math.max(170, toastText.implicitWidth + 34)
         height: 38
-        x: window.width - width - 24
-        y: window.height - 58
         radius: 19
-        color: "#D61B1F27"
+        color: "#D51C2028"
         border.width: 1
-        border.color: "#32FFFFFF"
-        property string accent: "#7BE7B0"
-        Text { id: toastText; anchors.centerIn: parent; text: toast.text; color: toast.accent; font.pixelSize: 9; font.bold: true; font.letterSpacing: 0.5 }
-        property string text: ""
-        ParallelAnimation { id: toastAnim
-            NumberAnimation { target: toast; property: "opacity"; from: 0; to: 1; duration: 180; easing.type: Easing.OutCubic }
-            NumberAnimation { target: toast; property: "y"; from: window.height - 48; to: window.height - 68; duration: 260; easing.type: Easing.OutBack }
-        }
-        Timer { id: toastTimer; interval: 1200; onTriggered: { toastAnim2.start() } }
-        NumberAnimation { id: toastAnim2; target: toast; property: "opacity"; from: 1; to: 0; duration: 180; onFinished: toast.visible = false }
+        border.color: "#35FFFFFF"
+        Text { id: toastText; anchors.centerIn: parent; text: ""; color: "#FFFFFF"; font.pixelSize: 9; font.bold: true; opacity: 0 }
+        Timer { id: toastTimer; interval: 1200; onTriggered: toastText.opacity = 0 }
+        Behavior on opacity { NumberAnimation { duration: 160 } }
     }
 }
