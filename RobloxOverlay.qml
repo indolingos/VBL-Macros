@@ -97,11 +97,10 @@ Window {
                 Row {
                     spacing: 8
                     Text {
-                        text: backend.running ? (backend.robloxFocused ? "VBL MACRO" : "VBL MACRO") : "VBL MACRO"
+                        text: "VBL MACRO"
                         color: "#F7F8FC"
                         font.pixelSize: 12
                         font.bold: true
-                        font.letterSpacing: 0.6
                     }
                     Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
@@ -119,7 +118,6 @@ Window {
                     color: overlay.accent
                     font.pixelSize: 9
                     font.bold: true
-                    font.letterSpacing: 0.8
                 }
 
                 Text {
@@ -148,7 +146,6 @@ Window {
                     color: "#858C99"
                     font.pixelSize: 7
                     font.bold: true
-                    letterSpacing: 1
                 }
             }
         }
