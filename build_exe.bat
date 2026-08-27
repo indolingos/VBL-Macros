@@ -1,13 +1,13 @@
 @echo off
 REM ============================================================
-REM  VBL Macro — standard Windows build script
+REM  VBL Macro — Qt/QML Liquid Glass Windows build
 REM  Output exe: dist\VBL-Macro.exe
 REM ============================================================
 
 setlocal
 
 python -m pip install --upgrade pip
-python -m pip install --upgrade pyinstaller keyboard pydirectinput pillow
+python -m pip install --upgrade pyinstaller keyboard pydirectinput pillow PySide6
 
 if not exist "app_icon.ico" (
     echo.
@@ -17,13 +17,22 @@ if not exist "app_icon.ico" (
     exit /b 1
 )
 
+if not exist "LiquidGlass.qml" (
+    echo.
+    echo [!] LiquidGlass.qml not found in this folder.
+    pause
+    exit /b 1
+)
+
 pyinstaller --noconfirm --onefile --windowed ^
     --name "VBL-Macro" ^
     --icon "app_icon.ico" ^
     --add-data "app_icon.ico;." ^
     --add-data "icon_512.png;." ^
+    --add-data "LiquidGlass.qml;." ^
     --hidden-import "keyboard._winkeyboard" ^
     --hidden-import "keyboard._winmouse" ^
+    --collect-all "PySide6" ^
     key_macro_gui.py
 
 echo.
