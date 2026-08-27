@@ -24,12 +24,20 @@ if not exist "LiquidGlass.qml" (
     exit /b 1
 )
 
+if not exist "RobloxOverlay.qml" (
+    echo.
+    echo [!] RobloxOverlay.qml not found in this folder.
+    pause
+    exit /b 1
+)
+
 pyinstaller --noconfirm --onefile --windowed ^
     --name "VBL-Macro" ^
     --icon "app_icon.ico" ^
     --add-data "app_icon.ico;." ^
     --add-data "icon_512.png;." ^
     --add-data "LiquidGlass.qml;." ^
+    --add-data "RobloxOverlay.qml;." ^
     --hidden-import "keyboard._winkeyboard" ^
     --hidden-import "keyboard._winmouse" ^
     --collect-all "PySide6" ^
