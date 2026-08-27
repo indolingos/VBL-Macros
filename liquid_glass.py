@@ -3,7 +3,6 @@
 import ctypes
 import os
 import sys
-import threading
 import time
 
 import keyboard
@@ -11,7 +10,6 @@ import pydirectinput
 from PySide6.QtCore import QObject, Property, QTimer, Signal, Slot, QUrl
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
-from PySide6.QtCore import Qt
 
 pydirectinput.PAUSE = 0
 
@@ -82,29 +80,17 @@ def apply_windows_glass(hwnd):
                 ("SizeOfData", ctypes.c_size_t),
             ]
 
-        ACCENT_ENABLE_ACRYLICBLURBEHIND = 4
-        WCA_ACCENT_POLICY = 19
-        # AARRGGBB. Low alpha lets the QML material show while Windows supplies the blur.
-        policy = ACCENT_POLICY(ACCENT_ENABLE_ACRYLICBLURBEHIND, 2, 0xB812151C, 0)
-        data = WINDOWCOMPOSITIONATTRIBDATA(
-            WCA_ACCENT_POLICY, ctypes.pointer(policy), ctypes.sizeof(policy)
-        )
+        policy = ACCENT_POLICY(4, 2, 0xB812151C, 0)
+        data = WINDOWCOMPOSITIONATTRIBDATA(19, ctypes.pointer(policy), ctypes.sizeof(policy))
         set_attr = user32.SetWindowCompositionAttribute
         set_attr.argtypes = [ctypes.c_void_p, ctypes.POINTER(WINDOWCOMPOSITIONATTRIBDATA)]
         set_attr.restype = ctypes.c_int
         set_attr(ctypes.c_void_p(int(hwnd)), ctypes.byref(data))
 
-        # Prefer rounded corners when Windows exposes the DWM attribute.
-        DWMWA_WINDOW_CORNER_PREFERENCE = 33
-        DWMSBT_MAINWINDOW = 2
         corner = ctypes.c_int(2)
         dwmapi.DwmSetWindowAttribute(
-            ctypes.c_void_p(int(hwnd)),
-            ctypes.c_uint(DWMWA_WINDOW_CORNER_PREFERENCE),
-            ctypes.byref(corner),
-            ctypes.sizeof(corner),
+            ctypes.c_void_p(int(hwnd)), ctypes.c_uint(33), ctypes.byref(corner), ctypes.sizeof(corner)
         )
-        _ = DWMSBT_MAINWINDOW
     except Exception:
         pass
 
@@ -115,10 +101,6 @@ class Bridge(QObject):
     eventChanged = Signal()
     statsChanged = Signal()
     toast = Signal(str, str)
-
-    def __init__(self):
-        super().__init__()
-        self._last_focus = None
 
     @Property(bool, notify=runningChanged)
     def running(self):
@@ -151,7 +133,8 @@ class Bridge(QObject):
     def toggle(self):
         global running, session_start
         running = not running
-        session_start = time.time() if running else session_start
+        if running:
+            session_start = time.time()
         self.runningChanged.emit()
         self.statsChanged.emit()
         self.toast.emit("MACRO ARMED" if running else "MACRO DISARMED", "#7BE7B0" if running else "#FF7186")
@@ -211,14 +194,25 @@ def main():
     engine = QQmlApplicationEngine()
     bridge = Bridge()
     engine.rootContext().setContextProperty("backend", bridge)
-    qml_path = resource_path("LiquidGlass.qml")
-    engine.load(QUrl.fromLocalFile(qml_path))
+
+    main_qml = resource_path("LiquidGlass.qml")
+    overlay_qml = resource_path("RobloxOverlay.qml")
+    engine.load(QUrl.fromLocalFile(main_qml))
+    engine.load(QUrl.fromLocalFile(overlay_qml))
     if not engine.rootObjects():
         raise RuntimeError("Unable to load LiquidGlass.qml")
 
-    root = engine.rootObjects()[0]
-    if IS_WINDOWS:
-        QTimer.singleShot(50, lambda: apply_windows_glass(int(root.winId())))
+    roots = engine.rootObjects()
+    main_root = next((obj for obj in roots if obj.objectName() == "mainWindow"), roots[0])
+    overlay_root = next((obj for obj in roots if obj.objectName() == "robloxOverlay"), None)
+
+    def apply_glass():
+        if IS_WINDOWS:
+            apply_windows_glass(int(main_root.winId()))
+            if overlay_root is not None:
+                apply_windows_glass(int(overlay_root.winId()))
+
+    QTimer.singleShot(100, apply_glass)
 
     keyboard.hook_key("`", make_handler("`", combo_tilde, bridge))
     keyboard.hook_key("r", make_handler("r", combo_r, bridge))
